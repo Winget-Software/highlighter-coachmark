@@ -131,10 +131,9 @@ class _FriendDetailsPageState extends State<FriendDetailsPage> {
                     ]),
                     Padding(
                         padding: EdgeInsets.only(top: 20.0),
-                        child: RaisedButton(
+                        child: ElevatedButton(
                           onPressed: () {},
                           child: Text("Got it"),
-                          color: Colors.blueGrey[600],
                         )),
                   ])),
         ],

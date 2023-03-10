@@ -21,7 +21,7 @@ class SkillsShowcase extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[]
                     ..add(Text("Communication",
-                        style: textTheme.body1
+                        style: textTheme.bodyText1
                             .copyWith(color: Colors.white70, fontSize: 16.0)))
                     ..add(
                       rngslider.RangeSlider(
@@ -37,7 +37,7 @@ class SkillsShowcase extends StatelessWidget {
                       ),
                     )))
               ..add(Text("Decision Making",
-                  style: textTheme.body1
+                  style: textTheme.bodyText1
                       .copyWith(color: Colors.white70, fontSize: 16.0)))
               ..add(
                 rngslider.RangeSlider(
@@ -52,7 +52,7 @@ class SkillsShowcase extends StatelessWidget {
                 ),
               )
               ..add(Text("Leadership",
-                  style: textTheme.body1
+                  style: textTheme.bodyText1
                       .copyWith(color: Colors.white70, fontSize: 16.0)))
               ..add(
                 rngslider.RangeSlider(

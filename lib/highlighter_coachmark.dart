@@ -2,7 +2,6 @@ library highlighter_coachmark;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/animation.dart';
 
 import 'dart:async';
 import 'dart:ui' as ui;
@@ -47,7 +46,7 @@ class CoachMark {
   CoachMark({this.bgColor = const Color(0xB2212121)});
 
   /// Global key to get an access for CoachMark's State
-  GlobalKey<_HighlighterCoachMarkState> globalKey;
+  GlobalKey<_HighlighterCoachMarkState> globalKey = GlobalKey<_HighlighterCoachMarkState>();
 
   /// Background color
   Color bgColor;
@@ -59,10 +58,10 @@ class CoachMark {
   bool get isVisible => _isVisible;
 
   /// Called when CoachMark is closed
-  VoidCallback _onClose;
+  VoidCallback? _onClose;
 
   /// Contains OverlayEntry with CoachMark's Widget
-  OverlayEntry _overlayEntryBackground;
+  OverlayEntry? _overlayEntryBackground;
 
   /// Brings out CoachMark's widget with animation on the whole screen
   ///
@@ -84,12 +83,12 @@ class CoachMark {
   ///
   /// Callback [onClose] is called when CoachMark is closed
   void show({
-    @required BuildContext targetContext,
-    @required List<Widget> children,
-    @required Rect markRect,
+    required BuildContext targetContext,
+    required List<Widget> children,
+    required Rect markRect,
     BoxShape markShape = BoxShape.circle,
-    Duration duration,
-    VoidCallback onClose,
+    Duration? duration,
+    VoidCallback? onClose,
   }) async {
     // Prevent from showing multiple marks at the same time
     if (_isVisible) {
@@ -100,7 +99,7 @@ class CoachMark {
 
     _onClose = _onClose ?? onClose;
 
-    globalKey = globalKey ?? GlobalKey<_HighlighterCoachMarkState>();
+    globalKey = globalKey ;
 
     _overlayEntryBackground = _overlayEntryBackground ??
         new OverlayEntry(
@@ -114,8 +113,8 @@ class CoachMark {
               ),
         );
 
-    OverlayState overlayState = Overlay.of(targetContext);
-    overlayState.insert(_overlayEntryBackground);
+    OverlayState overlayState = Overlay.of(targetContext)!;
+    overlayState.insert(_overlayEntryBackground!);
 
     if (duration != null) {
       await new Future.delayed(duration).then((_) => close());
@@ -125,12 +124,15 @@ class CoachMark {
   /// Closes CoachMark and callback optional [onClose]
   Future close() async {
     if (_isVisible) {
-      await globalKey?.currentState?.reverse();
-      _overlayEntryBackground.remove();
+      await globalKey.currentState?.reverse();
+
+      if (_overlayEntryBackground != null) {
+        _overlayEntryBackground!.remove();
+      }
 
       _isVisible = false;
       if (_onClose != null) {
-        _onClose();
+        _onClose!();
       }
     }
   }
@@ -140,12 +142,12 @@ class CoachMark {
 /// [markRect]
 class _HighlighterCoachMarkWidget extends StatefulWidget {
   _HighlighterCoachMarkWidget({
-    Key key,
-    @required this.markRect,
-    @required this.markShape,
-    @required this.children,
-    @required this.doClose,
-    @required this.bgColor,
+    Key? key,
+    required this.markRect,
+    required this.markShape,
+    required this.children,
+    required this.doClose,
+    required this.bgColor,
   }) : super(key: key);
 
   final Rect markRect;
@@ -160,9 +162,9 @@ class _HighlighterCoachMarkWidget extends StatefulWidget {
 
 class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _blurAnimation;
-  Animation<double> _opacityAnimation;
+  late AnimationController _controller;
+  late Animation<double> _blurAnimation;
+  late Animation<double> _opacityAnimation;
 
   //Does reverse animation, called when coachMark is closing.
   Future reverse() {
@@ -212,7 +214,7 @@ class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
 
     return AnimatedBuilder(
         animation: _controller,
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return Stack(
             children: <Widget>[
               ClipPath(
@@ -267,14 +269,14 @@ class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
 /// overrides a special hitTest
 class _CoachMarkLayer extends Listener {
   const _CoachMarkLayer(
-      {Key key,
+      {Key? key,
       onPointerDown,
       onPointerMove,
       onPointerUp,
       onPointerCancel,
       behavior,
-      this.markPosition,
-      Widget child})
+      required this.markPosition,
+      Widget? child})
       : super(
             key: key,
             onPointerDown: onPointerDown,
@@ -319,9 +321,9 @@ class _RenderPointerListenerWithExceptRegion extends RenderPointerListener {
       onPointerMove,
       onPointerUp,
       onPointerCancel,
-      HitTestBehavior behavior,
-      this.exceptRegion,
-      RenderBox child})
+      required HitTestBehavior behavior,
+      required this.exceptRegion,
+      RenderBox? child})
       : super(
             onPointerDown: onPointerDown,
             onPointerMove: onPointerMove,
@@ -333,7 +335,7 @@ class _RenderPointerListenerWithExceptRegion extends RenderPointerListener {
   final Rect exceptRegion;
 
   @override
-  bool hitTest(HitTestResult result, {Offset position}) {
+  bool hitTest(HitTestResult result, {required Offset position}) {
     bool hitTarget = false;
     if (exceptRegion.contains(position)) {
       result.add(new BoxHitTestEntry(this, position));
@@ -341,7 +343,9 @@ class _RenderPointerListenerWithExceptRegion extends RenderPointerListener {
     }
     if (size.contains(position)) {
       hitTarget =
-          hitTestChildren(result, position: position) || hitTestSelf(position);
+          hitTestChildren(result as BoxHitTestResult, position: position) ||
+              hitTestSelf
+            (position);
       if (hitTarget || behavior == HitTestBehavior.translucent)
         result.add(new BoxHitTestEntry(this, position));
     }
@@ -367,9 +371,9 @@ class _CoachMarkClipper extends CustomClipper<Path> {
 ///This class makes edges of hole blurred.
 class _CoachMarkPainter extends CustomPainter {
   _CoachMarkPainter({
-    @required this.rect,
-    @required this.shadow,
-    this.clipper,
+    required this.rect,
+    required this.shadow,
+    required this.clipper,
     this.coachMarkShape = BoxShape.circle,
   });
 

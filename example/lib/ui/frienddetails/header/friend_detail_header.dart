@@ -41,7 +41,7 @@ class FriendDetailHeader extends StatelessWidget {
 
   Widget _buildFollowerInfo(TextTheme textTheme) {
     var followerStyle =
-        textTheme.subhead.copyWith(color: const Color(0xBBFFFFFF));
+        textTheme.subtitle1.copyWith(color: const Color(0xBBFFFFFF));
 
     return new Padding(
       padding: const EdgeInsets.only(top: 16.0),
@@ -72,7 +72,7 @@ class FriendDetailHeader extends StatelessWidget {
         children: <Widget>[
           _createPillButton(
             'HIRE ME',
-            backgroundColor: theme.accentColor,
+            backgroundColor: theme.primaryColor
           ),
           new DecoratedBox(
             decoration: new BoxDecoration(
